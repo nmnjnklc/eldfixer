@@ -2,9 +2,7 @@ from django.apps import apps
 
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.forms import Form, CharField, TextInput, PasswordInput, ChoiceField, Select
-
-from .models import EldCommands, Skyonics, Applications
+from django.forms import Form, CharField, TextInput, PasswordInput, ChoiceField
 
 from django.core.exceptions import ValidationError
 
