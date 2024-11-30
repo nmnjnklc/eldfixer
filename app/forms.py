@@ -1,3 +1,5 @@
+from django.apps import apps
+
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from django.forms import Form, CharField, TextInput, PasswordInput, ChoiceField, Select
@@ -120,8 +122,15 @@ class VinDecoderForm(Form):
 
 
 class EldFixerForm(Form):
-    COMMAND_CHOICES = tuple((c.get("id"), c.get("command")) for c in EldCommands.get_visible())
-    SKYONICS_CHOICES = tuple((s.get("id"), s.get("name")) for s in Skyonics.get_visible())
+    @staticmethod
+    def get_command_choices() -> tuple:
+        command_model = apps.get_model("app", "EldCommands")
+        return tuple((c.get("id"), c.get("command")) for c in command_model.get_visible())
+
+    @staticmethod
+    def get_skyonics_choices() -> tuple:
+        skyonics_model = apps.get_model("app", "Skyonics")
+        return tuple((s.get("id"), s.get("name")) for s in skyonics_model.get_visible())
 
     eld_sn = CharField(
         label="",
@@ -133,15 +142,18 @@ class EldFixerForm(Form):
         )
     )
 
-    command = ChoiceField(choices=COMMAND_CHOICES)
+    command = ChoiceField(choices=get_command_choices())
 
-    skyonics = ChoiceField(choices=SKYONICS_CHOICES)
+    skyonics = ChoiceField(choices=get_skyonics_choices())
 
 
 class MalfunctionLetterForm(Form):
-    APPLICATION_CHOICES = tuple((a.get("id"), a.get("name")) for a in Applications.get_visible())
+    @staticmethod
+    def get_choices() -> tuple:
+        apps_model = apps.get_model("app", "Applications")
+        return tuple((a.get("id"), a.get("name")) for a in apps_model.get_visible())
 
-    application = ChoiceField(choices=APPLICATION_CHOICES, label="")
+    application = ChoiceField(choices=get_choices(), label="")
 
     company_name = CharField(
         label="",
