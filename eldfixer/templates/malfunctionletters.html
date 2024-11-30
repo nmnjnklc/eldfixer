@@ -1,0 +1,40 @@
+{% extends 'shared/base.html' %}
+{% block content %}
+    <div class="d-flex flex-row gap-5 mt-4 w-100">
+        <form method="post" action="/malfunctionletters/" class="w-25 mx-auto d-flex flex-column gap-3" style="width: 30% !important">
+            {% if ml_form %}
+                {% csrf_token %}
+                {{ ml_form }}
+                <input class="btn btn-primary mt-3" type="submit" value="Submit" />
+            {% endif %}
+        </form>
+        <div style="width: 70% !important">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Application</th>
+                        <th scope="col">Company name</th>
+                        <th scope="col">Vehicle number</th>
+                        <th scope="col">ELD Serial Number</th>
+                        <th scope="col">Created at</th>
+                        <th scope="col">Expires at</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if malfunction_letter_history %}
+                        {% for row in malfunction_letter_history %}
+                             <tr>
+                                 <td class="py-3">{{ row.application_id.name }}</td>
+                                 <td class="py-3">{{ row.company_name }}</td>
+                                 <td class="py-3">{{ row.vehicle_name }}</td>
+                                 <td class="py-3">{{ row.serial_number }}</td>
+                                 <td class="py-3">{{ row.created_at|date:'Y / m / d' }}</td>
+                                 <td class="py-3">{{ row.expires_at|date:'Y / m / d' }}</td>
+                             </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

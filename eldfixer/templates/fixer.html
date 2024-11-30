@@ -1,0 +1,92 @@
+{% extends 'shared/base.html' %}
+{% block content %}
+    <div class="d-flex flex-row gap-5 h-100 pt-3">
+        <div class="d-flex flex-column-reverse gap-5 h-100 pb-5" style="width: 30% !important;">
+            {% if vin_form %}
+                <div class="card">
+                    <h5 class="card-header">VIN Decoder</h5>
+                    <div class="card-body">
+                        <form action="/fixer/" method="post" class="d-flex flex-column gap-3">
+                            {% csrf_token %}
+                            {{ vin_form }}
+                            <input type="submit" name="vin_submit" class="btn btn-primary" value="Submit"/>
+                        </form>
+                    </div>
+                    <div class="card-footer text-body-primary p-3">
+                        <p class="mb-0">Result:
+                            {% if decoded_vin %}
+                                <strong class="ms-1">{{ decoded_vin }}</strong>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if fixer_form %}
+                <div class="card h-100">
+                    <h5 class="card-header">ELD Fixer</h5>
+                    <div class="card-body">
+                         <form action="/fixer/" method="post" class="d-flex flex-column gap-3">
+                            {% csrf_token %}
+                            {{ fixer_form }}
+                            <input type="submit" name="fixer_submit" class="btn btn-primary" value="Submit"/>
+                        </form>
+                    </div>
+                    <div class="card-footer text-body-primary h-100 p-3 d-flex flex-column justify-content-between">
+                        <div class="d-flex flex-row justify-content-between">
+                            <span>Success:</span>
+                            <strong>
+                                {% if command_response.response == 200 %}
+                                    True
+                                {% elif command_response.response %}
+                                    False
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between">
+                            <span>ELD serial number:</span>
+                            <strong>{{ command_response.eld_sn }}</strong>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between">
+                            <span>Command:</span>
+                            <strong>{{ command_response.command }}</strong>
+                        </div>
+                        <div class="d-flex flex-row justify-content-between">
+                            <span>ETA:</span>
+                            <strong>
+                                {% if command_response.response == 200 %}
+                                    {{ command_response.eta }}
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <div style="width: 70% !important;">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ELD Serial Number</th>
+                        <th scope="col">Skyonics</th>
+                        <th scope="col">Command</th>
+                        <th scope="col">Date / Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if command_history %}
+                        {% for row in command_history %}
+                             <tr>
+                                 <td class="py-3">{{ row.serial_number }}</td>
+                                 <td class="py-3">{{ row.skyonics_id.name }}</td>
+                                 <td class="py-3">{{ row.command_id.command }}</td>
+                                 <td class="py-3">{{ row.created_at|date:'Y/m/d h:i A' }}</td>
+                             </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
