@@ -2,6 +2,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.models import User
 from django.contrib import messages
 
+from django.apps import apps
+
 from django.core.exceptions import ValidationError
 
 from django.http import FileResponse
@@ -9,7 +11,6 @@ from django.http import FileResponse
 from django.shortcuts import render, redirect
 
 from .forms import LoginForm, RegisterForm, VinDecoderForm, EldFixerForm, MalfunctionLetterForm
-from .models import EldCommands, EldCommandsHistory, Applications, Skyonics, MalfunctionLettersHistory
 
 from utils.vin_decoder import vin_decoder
 from utils.skyonics_commands import send_command
@@ -100,6 +101,10 @@ def fixer(request) -> render or redirect:
     if not request.user.is_authenticated:
         return redirect(to="login")
 
+    skyonics_model = apps.get_model("app", "Skyonics")
+    eldcommands_model = apps.get_model("app", "EldCommands")
+    eldcommandshistory_model = apps.get_model("app", "EldCommandsHistory")
+
     vin_form = VinDecoderForm()
     fixer_form = EldFixerForm()
 
@@ -126,8 +131,8 @@ def fixer(request) -> render or redirect:
                 command_id = fixer_form.cleaned_data.get("command")
                 skyonics_id = fixer_form.cleaned_data.get("skyonics")
                 try:
-                    command = EldCommands.get_command_by_id(command_id=command_id).get("command")
-                    skyonics = Skyonics.get_skyonics_by_id(skyonics_id=skyonics_id).get("name")
+                    command = eldcommands_model.get_command_by_id(command_id=command_id).get("command")
+                    skyonics = skyonics_model.get_skyonics_by_id(skyonics_id=skyonics_id).get("name")
 
                     response = send_command(eld_sn=eld_sn, command=command, skyonics=skyonics)
 
@@ -138,16 +143,16 @@ def fixer(request) -> render or redirect:
                         "eta": (datetime.now() + timedelta(minutes=2)).time().strftime("%I:%M:%S %p")
                     }
 
-                    EldCommandsHistory.add(
+                    eldcommandshistory_model.add(
                         user_id=request.user,
-                        command_id=EldCommands.objects.get(id=command_id),
-                        skyonics_id=Skyonics.objects.get(id=skyonics_id),
+                        command_id=eldcommands_model.objects.get(id=command_id),
+                        skyonics_id=skyonics_model.objects.get(id=skyonics_id),
                         serial_number=eld_sn)
 
                 except ValidationError as e:
                     messages.warning(request=request, message=e.message)
 
-    command_history = EldCommandsHistory.get_user_history(user_id=user_id)
+    command_history = eldcommandshistory_model.get_user_history(user_id=user_id)
 
     return render(
         request=request,
@@ -165,15 +170,18 @@ def malfunctionletters(request) -> render or FileResponse:
     if not request.user.is_authenticated:
         return redirect(to="login")
 
+    applications_model = apps.get_model("app", "Applications")
+    malfunctionlettershistory_model = apps.get_model("app", "MalfunctionLettersHistory")
+
     if request.method == "POST":
         form = MalfunctionLetterForm(request.POST)
         if form.is_valid():
             form_dict: dict = form.cleaned_data
             buffer, file_name = generate_malfunction_letter(letter_data=form_dict)
 
-            MalfunctionLettersHistory.add(
+            malfunctionlettershistory_model.add(
                 user_id=request.user,
-                application_id=Applications.objects.get(id=form_dict.get("application")),
+                application_id=applications_model.objects.get(id=form_dict.get("application")),
                 company_name=form_dict.get("company_name"),
                 vehicle_name=form_dict.get("vehicle"),
                 serial_number=form_dict.get("eld_sn"),
@@ -184,7 +192,7 @@ def malfunctionletters(request) -> render or FileResponse:
     else:
         form = MalfunctionLetterForm()
 
-    malfunction_letter_history = MalfunctionLettersHistory.get()
+    malfunction_letter_history = malfunctionlettershistory_model.get()
 
     return render(
         request=request,

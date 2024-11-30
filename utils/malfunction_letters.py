@@ -2,7 +2,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.pagesizes import letter
 
-from app.models import Applications
+from django.apps import apps
 
 from datetime import datetime
 from pathlib import Path
@@ -16,6 +16,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 def generate_malfunction_letter(letter_data: dict):
     global BASE_DIR
 
+    application_model = apps.get_model("app", "Applications")
+
     buffer = io.BytesIO()
 
     app_id = letter_data.get("application")
@@ -26,7 +28,7 @@ def generate_malfunction_letter(letter_data: dict):
     vehicle_number = letter_data.get("vehicle")
     safety_contact = letter_data.get("safety_contact")
 
-    app_name = Applications.get_application_by_id(app_id=app_id).get("name")
+    app_name = application_model.get_application_by_id(app_id=app_id).get("name")
     logo_path = Path(BASE_DIR, "static", "images", "app_logos", f"{app_name.lower().replace(' ', '')}.png")
 
     if app_name == "ELD Rider":
