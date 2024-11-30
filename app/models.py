@@ -102,7 +102,7 @@ class EldCommandsHistory(models.Model):
                 .objects
                 .select_related("skyonics_id", "command_id")
                 .filter(user_id=user_id)
-                .order_by("created_at")
+                .order_by("-created_at")
                 .all()[:10])
 
     @staticmethod

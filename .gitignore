@@ -1,0 +1,12 @@
+.venv/
+.env
+
+*/.DS_Store
+.DS_Store
+
+.idea/
+
+app/__pycache__/
+app/migrations/__pycache__/
+config/__pycache__/
+utils/__pycache__/
