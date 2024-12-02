@@ -24,7 +24,7 @@ def log_in(request) -> render:
         login_form = LoginForm(request.POST)
 
         if login_form.is_valid():
-            username = login_form.cleaned_data.get("username")
+            username = login_form.cleaned_data.get("username").lower()
             password = login_form.cleaned_data.get("password")
 
             try:
@@ -69,7 +69,6 @@ def register(request) -> render:
                 form.clean_username()
                 form.clean_password2()
                 form.save()
-                print(form)
 
                 messages.success(request=request, message="User successfully created!")
                 return redirect(to="login")
@@ -186,7 +185,8 @@ def malfunctionletters(request) -> render or FileResponse:
                 vehicle_name=form_dict.get("vehicle"),
                 serial_number=form_dict.get("eld_sn"),
                 driver_name=form_dict.get("driver_name"),
-                codriver_name=form_dict.get("codriver_name"))
+                codriver_name=form_dict.get("codriver_name"),
+                expires_at=(datetime.now() + timedelta(days=8)).date())
 
             return FileResponse(buffer, as_attachment=True, filename=file_name)
     else:

@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-from django.db import connection
 from django.core.management import call_command
 
 

@@ -1,9 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from datetime import date, timedelta
-
-from django.db.models import Prefetch
+from datetime import date
 
 
 def get_app_logo(instance, filename) -> str:
@@ -126,7 +124,7 @@ class MalfunctionLettersHistory(models.Model):
     driver_name = models.CharField(max_length=64)
     codriver_name = models.CharField(max_length=64, default=None, blank=True, null=True)
     created_at = models.DateField(auto_now_add=True)
-    expires_at = models.DateField(default=(date.today() + timedelta(days=8)))
+    expires_at = models.DateField(default=None, blank=True, null=True)
 
     @staticmethod
     def get():
@@ -138,7 +136,7 @@ class MalfunctionLettersHistory(models.Model):
 
     @staticmethod
     def add(user_id: int, application_id: int, company_name: str, vehicle_name: str,
-            serial_number: str, driver_name: str, codriver_name: str) -> None:
+            serial_number: str, driver_name: str, codriver_name: str, expires_at: date) -> None:
         MalfunctionLettersHistory(
             user_id=user_id,
             application_id=application_id,
@@ -146,7 +144,8 @@ class MalfunctionLettersHistory(models.Model):
             vehicle_name=vehicle_name,
             serial_number=serial_number,
             driver_name=driver_name,
-            codriver_name=codriver_name
+            codriver_name=codriver_name,
+            expires_at=expires_at
         ).save()
 
     def __str__(self) -> str:
