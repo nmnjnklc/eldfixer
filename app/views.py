@@ -142,11 +142,12 @@ def fixer(request) -> render or redirect:
                         "eta": (datetime.now() + timedelta(minutes=2)).time().strftime("%I:%M:%S %p")
                     }
 
-                    eldcommandshistory_model.add(
-                        user_id=request.user,
-                        command_id=eldcommands_model.objects.get(id=command_id),
-                        skyonics_id=skyonics_model.objects.get(id=skyonics_id),
-                        serial_number=eld_sn)
+                    if response == 200:
+                        eldcommandshistory_model.add(
+                            user_id=request.user,
+                            command_id=eldcommands_model.objects.get(id=command_id),
+                            skyonics_id=skyonics_model.objects.get(id=skyonics_id),
+                            serial_number=eld_sn)
 
                 except ValidationError as e:
                     messages.warning(request=request, message=e.message)
