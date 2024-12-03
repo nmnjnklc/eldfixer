@@ -19,7 +19,10 @@ from utils.malfunction_letters import generate_malfunction_letter
 from datetime import datetime, timedelta
 
 
-def log_in(request) -> render:
+def log_in(request) -> render or redirect:
+    if request.user.is_authenticated:
+        return redirect(to="fixer")
+
     if request.method == "POST":
         login_form = LoginForm(request.POST)
 
