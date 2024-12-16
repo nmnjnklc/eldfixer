@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from datetime import date
+from datetime import datetime, date
 
 
 def get_app_logo(instance, filename) -> str:
@@ -131,6 +131,7 @@ class MalfunctionLettersHistory(models.Model):
         return (MalfunctionLettersHistory
                 .objects
                 .select_related("application_id")
+                .filter(expires_at__gte=datetime.now().date())
                 .order_by("expires_at")
                 .all()[:10])
 
