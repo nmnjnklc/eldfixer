@@ -64,6 +64,12 @@ def generate_malfunction_letter(letter_data: dict):
     if app_name == "Rock ELD":
         logo = Image(logo_path, width=250, height=60)
 
+    if app_name == "PEAK ELD":
+        logo = Image(logo_path, width=65, height=60)
+
+    if app_name == "POP ELD":
+        logo = Image(logo_path, width=150, height=60)
+
     current_date: str = str(datetime.now().date()).replace("-", "_")
 
     solo_driver: list[str] = ["Driver", driver_name, vehicle_number, "has", "he is", "his", app_name, "driver is",
