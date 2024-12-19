@@ -49,6 +49,9 @@ def generate_malfunction_letter(letter_data: dict):
     if app_name == "Xplore ELD":
         logo = Image(logo_path, width=250, height=60)
 
+    if app_name == "PTI ELD":
+        logo = Image(logo_path, width=80, height=60)
+
     if app_name == "TX ELD":
         logo = Image(logo_path, width=170, height=60)
 
